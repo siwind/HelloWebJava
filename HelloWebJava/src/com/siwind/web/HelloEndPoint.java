@@ -52,4 +52,14 @@ public class HelloEndPoint {
         System.out.println("Session " +session.getId()+" has closed!");
     }
     
+    /**
+     * 注意: OnError() 只能出现一次.   其中的参数都是可选的。
+     * @param session
+     * @param t
+     */
+    @OnError
+    public void onError(Session session, Throwable t) {
+        t.printStackTrace();
+    }
+    
 }

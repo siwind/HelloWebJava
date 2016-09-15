@@ -63,10 +63,10 @@
                 };
  
                 webSocket.onerror = function(event){
-                    writeResponse("<span style='color: red;'>ERROR: </span>Connection error! " + event.data);
+                    writeResponse("<span style='color: red;'>ERROR: </span>Connection error!  "  + event.data);
                 };
                 webSocket.onclose = function(event){
-                    writeResponse("<span style='color: blue;'>INFO: </span>Connection closed");
+                    writeResponse("<span style='color: blue;'>INFO: </span>Connection closed. code=" + event.code);
                 };
             }
            

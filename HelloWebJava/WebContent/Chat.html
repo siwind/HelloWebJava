@@ -62,9 +62,14 @@
                 };
             };
 
-            Chat.socket.onclose = function () {
+            Chat.socket.onclose = function (evt) {
                 document.getElementById('chat').onkeydown = null;
-                Console.log('Info: WebSocket closed.');
+                Console.log('Info: WebSocket closed. code=' + evt.code);
+            };
+            
+            Chat.socket.onerror = function (evt) {
+                document.getElementById('chat').onkeydown = null;
+                Console.log('error: WebSocket error.  code='  +evt.data);
             };
 
             Chat.socket.onmessage = function (message) {
@@ -74,6 +79,10 @@
 
         //==
         Chat.initialize = function() {
+        	if( Chat.socket != null && Chat.socket !== undefined && Chat.socket.readyState !== WebSocket.CLOSED ){
+        		Console.log('Info: WebSocket already open!');
+        		return;
+        	}
             Chat.connect(wsUri);
         };
         Chat.closeSocket = function() {
