@@ -22,13 +22,16 @@
         <!-- Script to utilise the WebSocket -->
         <script type="text/javascript">
             
-        	var wsUri = getRootUri() + "/HelloWebJava/WSHello";
-            var webSocket;
+        	 var webSocket;
             var messages = document.getElementById("messages");
            
-            function getRootUri() {
-                return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" +
-                        (document.location.port == "" ? "8080" : document.location.port);
+            var wsUri = getWebSocketUri("/HelloWebJava/WSHello");
+    		function getWebSocketUri( wsPath) {//example:  "/webapp/websocket-path"
+    					
+                return (window.location.protocol=="http:"?"ws://":"wss://") 
+                			+ (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" 
+                			+ (document.location.port == "" ? "80" : document.location.port) 
+                			+ wsPath;
             }
             
             function openSocket(){
