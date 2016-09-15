@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+ 
+<html>
+    <head>
+        <title>WebSocket Hello</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+       
+        <div>
+            Message: <input type="text" id="messageinput" />
+        </div>
+        <div>
+            <button type="button" onclick="openSocket();" >Open WebSocket</button>
+            <button type="button" onclick="send();" >Send Message</button>
+            <button type="button" onclick="closeSocket();" >Close WebSocket</button>
+        </div>
+        <!-- Server responses get written here -->
+        <div id="messages"></div>
+       
+        <!-- Script to utilise the WebSocket -->
+        <script type="text/javascript">
+            
+        	var wsUri = getRootUri() + "/HelloWebJava/WSHello";
+            var webSocket;
+            var messages = document.getElementById("messages");
+           
+            function getRootUri() {
+                return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" +
+                        (document.location.port == "" ? "8080" : document.location.port);
+            }
+            
+            function openSocket(){
+                // Ensures only one connection is open at a time
+                if( webSocket != null && webSocket !== undefined && webSocket.readyState !== WebSocket.CLOSED ){
+                   writeResponse("WebSocket is already opened.");
+                    return;
+                }
+                // Create a new instance of the websocket
+                //webSocket = new WebSocket("ws://localhost:8080/EchoChamber/echo");
+                writeResponse("<span style='color: blue;'>INFO: </span>Open WebSocket: " + wsUri);
+                webSocket = new WebSocket(wsUri);
+                 
+                /**
+                 * Binds functions to the listeners for the websocket.
+                 */
+                webSocket.onopen = function(event){
+                    // For reasons I can't determine, onopen gets called twice
+                    // and the first time event.data is undefined.
+                    // Leave a comment if you know the answer.
+                    if(event.data === undefined)
+                        return;
+ 
+                    writeResponse(event.data);
+                };
+ 
+                webSocket.onmessage = function(event){
+                    writeResponse(event.data);
+                };
+ 
+                webSocket.onerror = function(event){
+                    writeResponse("<span style='color: red;'>ERROR: </span>Connection error! " + event.data);
+                };
+                webSocket.onclose = function(event){
+                    writeResponse("<span style='color: blue;'>INFO: </span>Connection closed");
+                };
+            }
+           
+            /**
+             * Sends the value of the text input to the server
+             */
+            function send(){
+            	if( webSocket ==null ||  webSocket === undefined || webSocket.readyState === WebSocket.CLOSED){
+            		writeResponse("<span style='color: red;'>ERROR: </span>WebSocket is not opened!");
+            		return;
+            	}
+                var text = document.getElementById("messageinput").value;
+                if( text.length ==0 ){
+                	writeResponse("<span style='color: red;'>ERROR: </span>Message is empty!");
+                	return;
+                }
+                webSocket.send(text);
+            }
+           
+            function closeSocket(){
+            	if( webSocket !=null ){
+                	webSocket.close();
+                	webSocket=null;
+            	} else{
+            		writeResponse("<span style='color: blue;'>INFO: </span>Connection already closed");
+            	}
+            }
+ 
+            function writeResponse(text){
+                messages.innerHTML += "<br/>" + text;
+            }
+           
+        </script>
+       
+    </body>
+</html>
