@@ -43,7 +43,7 @@
         Chat.socket = null;
 
         Chat.connect = (function(host) {
-        	//Console.log('Info: Open WebSocket: ' + wsUri );
+        	Console.log('Info: ' + wsUri );
             if ('WebSocket' in window) {
                 Chat.socket = new WebSocket(host);
             } else if ('MozWebSocket' in window) {
@@ -72,10 +72,19 @@
             };
         });
 
+        //==
         Chat.initialize = function() {
             Chat.connect(wsUri);
         };
-
+        Chat.closeSocket = function() {
+            if( Chat.socket !=null ){
+            	Chat.socket.close();
+            	Chat.socket = null;
+            }else{
+            	Console.log('Info: WebSocket already close!');
+            }
+        };
+        
         Chat.sendMessage = (function() {
             var message = document.getElementById('chat').value;
             if (message != '') {
@@ -100,9 +109,7 @@
             console.scrollTop = console.scrollHeight;
         });
 
-        Chat.initialize();
-
-
+       // Chat.initialize();
         document.addEventListener("DOMContentLoaded", function() {
             // Remove elements with "noscript" class - <noscript> is not allowed in XHTML
             var noscripts = document.getElementsByClassName("noscript");
@@ -121,6 +128,10 @@
 			enable Javascript and reload this page!</h2>
 	</div>
 	<div>
+	<div>
+            <button type="button" onclick="Chat.initialize();" >Open WebSocket</button>
+            <button type="button" onclick="Chat.closeSocket();" >Close WebSocket</button>
+        </div>
 		<p>
 			<input type="text" placeholder="type and press enter to chat"
 				id="chat" />
