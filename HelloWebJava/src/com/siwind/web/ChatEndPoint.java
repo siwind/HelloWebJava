@@ -15,22 +15,22 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint(value = "/WSChat")
 public class ChatEndPoint {
 
-	private static final String GUEST_PREFIX = "Guest";
-	private static final AtomicInteger connectionIds = new AtomicInteger(0);
+	private static final String SESSION_PREFIX = "Client";
+	private static final AtomicInteger connIndex = new AtomicInteger(0);
 	private static final Set<ChatEndPoint> connections = new CopyOnWriteArraySet<>();
 
-	private final String nickname;
+	private final String sessionName;
 	private Session session;
 
 	public ChatEndPoint() {
-		nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
+		sessionName = SESSION_PREFIX + connIndex.getAndIncrement();
 	}
 
 	@OnOpen
 	public void start(Session session) {
 		this.session = session;
 		connections.add(this);
-		String message = String.format("* %s %s", nickname, "has been connected.");
+		String message = String.format("* %s %s", sessionName, "has been connected.");
 		System.out.println(message);
 		broadcast(message);
 	}
@@ -38,7 +38,7 @@ public class ChatEndPoint {
 	@OnClose
 	public void end() {
 		connections.remove(this);
-		String message = String.format("* %s %s", nickname, "has disconnected.");
+		String message = String.format("* %s %s", sessionName, "has disconnected.");
 		broadcast(message);
 	}
 
@@ -46,7 +46,7 @@ public class ChatEndPoint {
 	public void incoming(String message) {
 		// Never trust the client
 		//String filteredMessage = String.format("%s: %s", nickname, HTMLFilter.filter(message.toString()));
-		String filteredMessage = String.format("%s: %s", nickname, (message.toString()));
+		String filteredMessage = String.format("%s: %s", sessionName, (message.toString()));
 		System.out.println(filteredMessage);
 		broadcast(filteredMessage);
 	}
@@ -70,7 +70,7 @@ public class ChatEndPoint {
 				} catch (IOException e1) {
 					// Ignore
 				}
-				String message = String.format("* %s %s", client.nickname, "has been disconnected.");
+				String message = String.format("* %s %s", client.sessionName, "has been disconnected.");
 				broadcast(message);
 			}
 		}
